@@ -16,7 +16,7 @@ class Settings(BaseSettings):
             )
 
     sqlite_database_url: str = Field(default="sqlite+aiosqlite:///./notes.db", alias="DATABASE_URL")
-    token: str = "quick_notes_token"
+    token_salt: str = Field(default="quick_notes_token_salt", alias="TOKEN_SALT")
     debug: bool = False
     
 

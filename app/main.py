@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from config.db import create_db_tables, engine
+import auth
 import logging
 
 logging.basicConfig(
@@ -32,6 +33,8 @@ app = FastAPI(
         version="1.0",
         lifespan=lifespan,
         )
+
+app.include_router(auth.router)
 
 @app.get("/")
 def root():
