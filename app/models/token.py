@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field
 
+
 class Token(SQLModel, table=True):
     """Maps a fake bearer token to user.Id"""
 
@@ -7,4 +8,3 @@ class Token(SQLModel, table=True):
 
     token: str = Field(primary_key=True)
     user_id: str = Field(index=True)
-

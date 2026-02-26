@@ -2,15 +2,17 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from config.db import create_db_tables, engine
 import auth
+import notes
 import logging
 
 logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)-8s %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S",
-        )
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S",
+)
 
 logger = logging.getLogger("quick_notes")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,14 +30,17 @@ async def lifespan(app: FastAPI):
     await engine.dispose()
     logger.info("Graceful shutdown complete.")
 
+
 app = FastAPI(
-        title  = "Quick Notes API",
-        version="1.0",
-        lifespan=lifespan,
-        )
+    title="Quick Notes API",
+    version="1.0",
+    lifespan=lifespan,
+)
 
 app.include_router(auth.router)
+app.include_router(notes.router)
 
-@app.get("/")
+
+@app.get("/health")
 def root():
-    return {"message": "hello world"}
+    return {"status": "ok"}

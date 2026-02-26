@@ -9,6 +9,7 @@ from models.token import Token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+
 class LoginRequest(BaseModel):
     userId: str
 
@@ -21,9 +22,9 @@ class LoginRequest(BaseModel):
         return v
 
 
-
 class LoginResponse(BaseModel):
     token: str
+
 
 def _make_token(user_id: str) -> str:
     """Deterministic token: sha-256(salt + userId), prefixed with tok_."""
@@ -33,14 +34,12 @@ def _make_token(user_id: str) -> str:
 
 @router.post("/mock-login", response_model=LoginResponse)
 async def mock_login(
-        body: LoginRequest,
-        session: AsyncSession = Depends(get_session),
-        ) -> LoginResponse:
+    body: LoginRequest,
+    session: AsyncSession = Depends(get_session),
+) -> LoginResponse:
     token_value = _make_token(body.userId)
 
-    existing = await session.exec(
-            select(Token).where(Token.token == token_value)
-            )
+    existing = await session.exec(select(Token).where(Token.token == token_value))
     if not existing.first():
         session.add(Token(token=token_value, user_id=body.userId))
 
