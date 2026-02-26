@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
+
 class CreateNoteRequest(BaseModel):
     title: str
     body: Optional[str] = ""
@@ -33,6 +34,7 @@ class CreateNoteRequest(BaseModel):
         if len(v) > 500:
             raise ValueError("Body should be less than 500 characters")
         return v
+
 
 class PathNoteRequest(BaseModel):
     title: Optional[str] = None
@@ -64,49 +66,54 @@ class PathNoteRequest(BaseModel):
             raise ValueError("Body should be less than 500 characters")
         return v
 
+
 async def _get_note_or_404(note_id: str, session: AsyncSession) -> Note:
     note = await session.get(Note, note_id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
     return note
 
+
 def _assert_owner(note: Note, user_id: str) -> None:
     if note.owner != user_id:
         raise HTTPException(status_code=403, detail="Not the owner")
 
+
 # ------------------------------------------------------------------------
 # Routes
 
+
 @router.post("", status_code=201, response_model=NoteResponse)
 async def create_note(
-        body: CreateNoteRequest,
-        session: AsyncSession = Depends(get_session),
-        user_id: str = Depends(get_current_user),
-        ) -> NoteResponse:
+    body: CreateNoteRequest,
+    session: AsyncSession = Depends(get_session),
+    user_id: str = Depends(get_current_user),
+) -> NoteResponse:
     note = Note(owner=user_id, title=body.title, body=body.body or "")
     session.add(note)
     await session.flush()
     await session.refresh(note)
     return NoteResponse.from_note(note)
 
+
 @router.get("", status_code=200, response_model=List[NoteResponse])
 async def list_notes(
-        session: AsyncSession = Depends(get_session),
-        user_id: str = Depends(get_current_user),
-        ) -> List[NoteResponse]:
+    session: AsyncSession = Depends(get_session),
+    user_id: str = Depends(get_current_user),
+) -> List[NoteResponse]:
     result = await session.exec(
-            select(Note).where(Note.owner == user_id).order_by(desc(Note.created_at))
-            )
+        select(Note).where(Note.owner == user_id).order_by(desc(Note.created_at))
+    )
     return [NoteResponse.from_note(n) for n in result.all()]
 
 
 @router.patch("/{note_id}", status_code=200, response_model=NoteResponse)
 async def update_note(
-        note_id: str,
-        body: PathNoteRequest,
-        session: AsyncSession = Depends(get_session),
-        user_id: str = Depends(get_current_user),
-        ) -> NoteResponse:
+    note_id: str,
+    body: PathNoteRequest,
+    session: AsyncSession = Depends(get_session),
+    user_id: str = Depends(get_current_user),
+) -> NoteResponse:
     note = await _get_note_or_404(note_id, session)
     _assert_owner(note, user_id)
 
@@ -121,14 +128,14 @@ async def update_note(
     await session.refresh(note)
     return NoteResponse.from_note(note)
 
+
 @router.delete("/{note_id}", status_code=204)
 async def delete_note(
-        note_id: str,
-        session: AsyncSession = Depends(get_session),
-        user_id: str = Depends(get_current_user),
-        ) -> Response:
+    note_id: str,
+    session: AsyncSession = Depends(get_session),
+    user_id: str = Depends(get_current_user),
+) -> Response:
     note = await _get_note_or_404(note_id, session)
     _assert_owner(note, user_id)
     await session.delete(note)
     return Response(status_code=204)
-

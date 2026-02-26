@@ -55,6 +55,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
     { name = "sqlmodel" },
+    { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
@@ -72,6 +73,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.13.1" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "sqlmodel", specifier = ">=0.0.37" },
+    { name = "uvicorn", specifier = ">=0.41.0" },
 ]
 
 [package.metadata.requires-dev]

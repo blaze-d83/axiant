@@ -33,7 +33,7 @@ class Note(SQLModel, table=True):
 
 
 class NoteResponse(SQLModel):
-    id : str
+    id: str
     title: str
     body: str
     created_at: datetime = Field(alias="createdAt")
@@ -44,9 +44,9 @@ class NoteResponse(SQLModel):
     @classmethod
     def from_note(cls, note: Note) -> "NoteResponse":
         return cls(
-                id=note.id,
-                title=note.id,
-                body=note.body,
-                createdAt=note.created_at,
-                updatedAt=note.updated_at,
-                )
+            id=note.id,
+            title=note.id,
+            body=note.body,
+            createdAt=note.created_at,
+            updatedAt=note.updated_at,
+        )

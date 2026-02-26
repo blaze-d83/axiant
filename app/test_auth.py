@@ -1,4 +1,4 @@
-import pytest #noqa
+import pytest  # noqa
 from httpx import AsyncClient, ASGITransport
 from main import app
 
@@ -24,13 +24,12 @@ def auth(token: str) -> dict:
 async def test_login_returns_tokens(self, client: AsyncClient):
     transport = ASGITransport(app=app)
     async with AsyncClient(
-            transport=transport,
-            base_url="/https://test",
-            ) as client:
+        transport=transport,
+        base_url="/https://test",
+    ) as client:
         response = await client.post("/auth/mock-login", json={"userId": "darshan"})
 
     assert response.status_code == 200
     data = response.json()
     assert "token" in data
     assert isinstance(data["token"], str)
-
